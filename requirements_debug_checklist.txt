@@ -1,0 +1,36 @@
+x appnope==0.1.0
+x backcall==0.1.0
+x bcrypt==3.1.4 <- also failed so did pip install bcrypt and it put in 3.2.0
+x blinker==1.4
+ cffi==1.14.2 <-- first time failed upgraded to 1.14.5 hopefully will work
+x Click==7.0
+x decorator==4.3.0
+x Faker==0.9.1
+x Flask==1.0.2
+x Flask-Bcrypt==0.7.1
+x Flask-DebugToolbar==0.10.1
+x Flask-SQLAlchemy==2.3.2
+x Flask-WTF==0.14.2
+x ipython==7.0.1
+x ipython-genutils==0.2.0
+x itsdangerous==0.24
+x jedi==0.13.1
+x Jinja2==2.10
+x MarkupSafe==1.1.1
+x parso==0.3.1
+x pexpect==4.6.0
+x pickleshare==0.7.5
+x prompt-toolkit==2.0.5
+x psycopg2-binary==2.8.4 <-- wouldn't install so pip installed/switched to 2.8.6
+x ptyprocess==0.6.0
+x pycparser==2.19
+x Pygments==2.2.0
+x python-dateutil==2.7.3
+x simplegeneric==0.8.1
+x six==1.11.0
+x SQLAlchemy==1.2.12
+x text-unidecode==1.2
+x traitlets==4.3.2
+x wcwidth==0.1.7
+x Werkzeug==0.14.1
+x WTForms==2.2.1
