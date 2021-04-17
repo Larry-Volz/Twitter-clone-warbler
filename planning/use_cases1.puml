@@ -1,0 +1,47 @@
+@startuml Remember Together - use cases 
+skinparam actorStyle Hollow
+
+"User" as user
+"Admin" as admin
+
+"Sign up" as (signup)
+"Login" as (do_login)
+"Add user to global" as (add_user_to_g)
+"List users" as (list_users)
+"Single users show" as (users_show)
+"Show following" as (show_following)
+"User's followers" as (users_followers)
+"Add a follow" as (add_follow)
+"Stop following" as (stop_following)
+"Update profile" as (profile)
+"Delete user" as (delete_user)
+"Messages add" as (messages_add)
+"Messages show" as (messages_show)
+"Message destroy" as (messages_destroy)
+"Show homepage" as (homepage)
+
+user --> (signup)
+user --> (do_login)
+user --> (logout)
+
+(do_login) --> (add_user_to_g)
+(signup) --> (add_user_to_g)
+(add_user_to_g) --> (homepage)
+
+(homepage) --> (list_users)
+(homepage) --> (users_followers)
+
+(homepage) --> (show_following)
+(show_following) --> (add_follow)
+(show_following) --> (stop_following)
+
+(homepage) --> (users_show)
+(users_show) --> (profile)
+(users_show) --> (delete_user)
+
+(homepage) -->(messages_show)
+(messages_show) --> (messages_add)
+(messages_show) --> (messages_destroy)
+
+
+@enduml
