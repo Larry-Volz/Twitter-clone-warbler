@@ -1,3 +1,5 @@
+#! c:\Python\Python377\python.exe
+
 import os 
 
 from flask import Flask, render_template, request, flash, redirect, session, g

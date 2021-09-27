@@ -1,0 +1,4 @@
+- Run Flask in Warbler subdirectory
+- Best using Python version 3.7
+  - If you are using Python 3.8 instead of 3.7, then you will have issues with installing some of the packages in the requirements.txt file into your virtual environment. 
+  - For Python 3.8 students, we recommend deleting psycopg2-binary==2.8.6 from the requirements.txt file, and using pip install psycopg2-binary in the terminal in order to successfully install this package. 
