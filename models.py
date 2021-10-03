@@ -122,7 +122,7 @@ class User(db.Model):
         """Is this user followed by `other_user`?"""
 
         found_user_list = [user for user in self.followers if user == other_user]
-        return len(found_user_list) == 1
+        return len(found_user_list) == 1  #question: does this limit the return to just one?
 
     def is_following(self, other_user):
         """Is this user following `other_use`?"""
@@ -153,7 +153,7 @@ class User(db.Model):
     def authenticate(cls, username, password):
         """Find user with `username` and `password`.
 
-        This is a class method (call it on the class, not an individual user.)
+        This is a class method (call it on the CLASS, not an individual user.)  <--- NOTE THIS!
         It searches for a user whose password hash matches this password
         and, if it finds such a user, returns that user object.
 

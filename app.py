@@ -31,9 +31,11 @@ connect_db(app)
 # User signup/login/logout
 
 
-@app.before_request
+@app.before_request #question: what is .before_request?
 def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
+
+    # question: what is Flask global?
 
     if CURR_USER_KEY in session:
         g.user = User.query.get(session[CURR_USER_KEY])
@@ -116,6 +118,15 @@ def logout():
     """Handle logout of user."""
 
     # IMPLEMENT THIS
+    # Log out in session
+    do_logout()
+
+    #flash logged out
+    flash("You have been logged out", "info")
+
+    # return to "/"
+
+    return redirect("/login")
 
 
 ##############################################################################
