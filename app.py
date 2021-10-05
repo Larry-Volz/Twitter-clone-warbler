@@ -117,7 +117,7 @@ def login():
 def logout():
     """Handle logout of user."""
 
-    # IMPLEMENT THIS
+    # IMPLEMENTED
     # Log out in session
     do_logout()
 
@@ -225,6 +225,7 @@ def profile():
     """Update profile for current user."""
 
     # IMPLEMENT THIS
+   
 
 
 @app.route('/users/delete', methods=["POST"])
