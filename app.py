@@ -7,7 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm, UserProfileUpdateForm
-from models import db, connect_db, User, Message
+from models import db, connect_db, User, Message, Likes
 
 CURR_USER_KEY = "curr_user"
 
@@ -20,7 +20,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 toolbar = DebugToolbarExtension(app)
 
@@ -266,9 +266,6 @@ def profile():
 
 
 
-
-
-
 @app.route('/users/delete', methods=["POST"])
 def delete_user():
     """Delete user."""
@@ -283,6 +280,32 @@ def delete_user():
     db.session.commit()
 
     return redirect("/signup")
+
+
+# IMPLEMENTED - REVIEW THIS!
+@app.route('/users/add_like/<int:message_id>', methods=["POST"])
+def like_unlike(message_id):
+    """ Like or unlike a message for the current logged-in user"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    # get this message
+    message_liked = Message.query.get_or_404(message_id)
+
+    #query for a Like that has this message_number and this user_id
+    user_likes = g.user.likes
+
+    if message_liked in user_likes:
+        g.user.likes = [like for like in user_likes if like != message_liked]
+    else:
+        g.user.likes.append(message_liked)
+
+    db.session.commit()
+
+    
+    return redirect("/")
 
 
 ##############################################################################
@@ -347,7 +370,7 @@ def homepage():
     """
 
     if g.user:
-
+        # IMPLEMENTED
         following = [f.id for f in g.user.following] + [g.user.id]
         messages = (Message
                     .query
@@ -355,8 +378,14 @@ def homepage():
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())
+                    
+        likes = Likes.query.filter(Likes.user_id == g.user.id).all()
 
-        return render_template('home.html', messages=messages)
+        liked_ids = [msg.id for msg in g.user.likes]
+
+        # POSSIBLY PASS [ids]
+
+        return render_template('home.html', messages=messages, likes=liked_ids)
 
     else:
         return render_template('home-anon.html')
