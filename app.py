@@ -162,7 +162,10 @@ def users_show(user_id):
                 .order_by(Message.timestamp.desc())
                 .limit(100)
                 .all())
-    return render_template('users/show.html', user=user, messages=messages)
+
+    likes = Likes.query.filter(Likes.user_id == g.user.id).all()
+
+    return render_template('users/show.html', user=user, messages=messages, likes=likes)
 
 
 @app.route('/users/<int:user_id>/following')
@@ -187,6 +190,14 @@ def users_followers(user_id):
 
     user = User.query.get_or_404(user_id)
     return render_template('users/followers.html', user=user)
+
+# IMPLEMENT THIS
+@app.route('/users/<int:user_id>/likes')
+def list_likes(user_id):
+    """Displays a list of user's likes"""
+
+
+    return "LIST OF LIKES"
 
 
 @app.route('/users/follow/<int:follow_id>', methods=['POST'])
