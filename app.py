@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-from forms import UserAddForm, LoginForm, MessageForm
+from forms import UserAddForm, LoginForm, MessageForm, UserProfileUpdateForm
 from models import db, connect_db, User, Message
 
 CURR_USER_KEY = "curr_user"
@@ -100,8 +100,7 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        user = User.authenticate(form.username.data,
-                                 form.password.data)
+        user = User.authenticate(form.username.data,form.password.data)
 
         if user:
             do_login(user)
@@ -222,10 +221,52 @@ def stop_following(follow_id):
 
 @app.route('/users/profile', methods=["GET", "POST"])
 def profile():
-    """Update profile for current user."""
+    """Update profile for current user.
 
-    # IMPLEMENT THIS
-   
+    It should edit the user for all of these fields except password (ie, this is not an area where users can change their passwords–the password is only for checking if it is the current correct password.
+    On success, it should redirect to the user detail page.
+    """
+
+    # IMPLEMENTED
+
+    #It should ensure a user is logged on (you can see how this is done in other routes)
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    #It should show a form with  username, email, image_url, header_image_url, bio, password [see below]
+
+    user = User.query.get_or_404(g.user.id)
+    form = UserProfileUpdateForm(obj=user)
+
+    # It should check that that password is the valid password for the user—if not, it should flash an error and return to the homepage.
+    rawPassword = form.password.data
+
+    if form.validate_on_submit():
+        
+        if User.authenticate(form.username.data,form.password.data):
+
+            user.username = form.username.data
+            user.email = form.email.data
+            user.image_url = form.image_url.data 
+            user.header_image_url = form.header_image_url.data
+            user.bio = form.bio.data
+
+            db.session.commit()
+
+            flash(f"Successfully edited {user.username}")
+            return redirect('/')
+
+        else:
+            flash("Invalid credentials.", 'danger')
+            return render_template("users/edit.html", form=form, user=user)
+    
+    else: 
+        return render_template("users/edit.html", form=form, user=user)
+
+
+
+
 
 
 @app.route('/users/delete', methods=["POST"])
@@ -306,8 +347,11 @@ def homepage():
     """
 
     if g.user:
+
+        following = [f.id for f in g.user.following] + [g.user.id]
         messages = (Message
                     .query
+                    .filter(Message.user_id.in_(following))
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())
