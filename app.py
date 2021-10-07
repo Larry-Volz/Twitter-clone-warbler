@@ -196,8 +196,27 @@ def users_followers(user_id):
 def list_likes(user_id):
     """Displays a list of user's likes"""
 
+    if g.user:
+        # IMPLEMENTED
+        following = [f.id for f in g.user.following] + [g.user.id]
+        messages = (Message
+                    .query
+                    .filter(Message.user_id.in_(following))
+                    .order_by(Message.timestamp.desc())
+                    .limit(100)
+                    .all())
+                    
+        likes = Likes.query.filter(Likes.user_id == g.user.id).all()
 
-    return "LIST OF LIKES"
+        liked_ids = [msg.id for msg in g.user.likes]
+
+        # POSSIBLY PASS [ids]
+
+        return render_template('liked.html', messages=messages, likes=liked_ids)
+
+    else:
+        return render_template('home-anon.html')
+
 
 
 @app.route('/users/follow/<int:follow_id>', methods=['POST'])
