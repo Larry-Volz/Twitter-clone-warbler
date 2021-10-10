@@ -143,6 +143,7 @@ def list_users():
     if not search:
         users = User.query.all()
     else:
+        # NOTE: Good way to search for similar items & return a list!
         users = User.query.filter(User.username.like(f"%{search}%")).all()
 
     return render_template('users/index.html', users=users)

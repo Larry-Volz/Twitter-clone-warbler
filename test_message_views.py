@@ -48,6 +48,8 @@ class MessageViewTestCase(TestCase):
                                     email="test@test.com",
                                     password="testuser",
                                     image_url=None)
+        self.testuser_id = 999999
+        self.testuser.id = self.testuser_id
 
         db.session.commit()
 
@@ -64,10 +66,80 @@ class MessageViewTestCase(TestCase):
             # Now, that session setting is saved, so we can have
             # the rest of ours test
 
-            resp = c.post("/messages/new", data={"text": "Hello"})
+            resp = c.post("/messages/new", data={"text": "testing"})
 
             # Make sure it redirects
             self.assertEqual(resp.status_code, 302)
 
             msg = Message.query.one()
-            self.assertEqual(msg.text, "Hello")
+            self.assertEqual(msg.text, "testing")
+
+        def test_add_message_without_auth(self):
+            """Can use add a message without signing in?"""
+            with self.client as c:
+                resp = c.post("/messages/new", data={"text": "testing again"}, follow_redirects=True)
+                self.assertEqual(resp.status_code, 200)
+                self.assertIn("Access unauthorized", str(resp.data))
+                #question: why is this not showing as another test?
+
+        def test_add_invalid_user(self):
+            with self.client as c:
+                with c.session_transaction() as sess:
+                    sess[CURR_USER_KEY] = 888 # non-existant user
+
+                resp = c.post("/messages/new", data={"text": "Hello"}, follow_redirects=True)
+                self.assertEqual(resp.status_code, 200)
+                self.assertIn("Access unauthorized", str(resp.data))
+
+
+        def test_like_unlike(self):
+            """ Does user Like or unlike a message for the current logged-in user"""
+
+
+        def test_messages_show(self):
+            """does system show a message."""
+    
+            m = Message(
+                id=101,
+                text="help me I'm meeeeellllting",
+                user_id=self.testuser_id
+            )
+            
+            db.session.add(m)
+            db.session.commit()
+
+            with self.client as c:
+                with c.session_transaction() as sess:
+                    sess[CURR_USER_KEY] = self.testuser.id
+                
+                m = Message.query.get(101)
+
+                resp = c.get(f'/messages/{m.id}')
+
+                self.assertEqual(resp.status_code, 200)
+                self.assertIn(m.text, str(resp.data))
+
+
+        def test_messages_destroy(self):
+            """Does system delete a message."""
+    
+            m = Message(
+                id=777,
+                text="testingpalooza",
+                user_id=self.testuser_id
+            )
+            db.session.add(m)
+            db.session.commit()
+
+            with self.client as c:
+                with c.session_transaction() as sess:
+                    sess[CURR_USER_KEY] = self.testuser.id
+
+                resp = c.post("/messages/777/delete", follow_redirects=True)
+                self.assertEqual(resp.status_code, 200)
+
+                m = Message.query.get(777)
+                self.assertIsNone(m)
+
+
+        
